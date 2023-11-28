@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category{
+  Phones
+  Tablets
+  Notebooks
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  category Category
+  amount Int
+  price Float
+  orders_products OrdersProducts[]
+
+  @@map("products")
+}
+
+model Customer {
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String
+  middle_name String?
+  email String @unique
+  birth_date DateTime
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Employee {
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String
+  middle_name String?
+  position String
+  orders Order[]
+
+  @@map("employees")
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  employee Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+  employee_id Int
+  customer Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  customer_id Int
+  order_address String
+  delivery_cost Float
+  order_date DateTime @default(now())
+  orders_products OrdersProducts[]
+
+  @@map("orders")
+}
+
+model OrdersProducts {
+  id Int @id @default(autoincrement())
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order_id Int
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product_id Int
+  amount Int
+
+  @@map("orders_products")
+}
